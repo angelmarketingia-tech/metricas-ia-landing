@@ -6,15 +6,41 @@
   --font-display: "Space Grotesk", sans-serif;
   --font-accent: "Outfit", sans-serif;
   
-  --color-brand-navy: #020617;
   --color-brand-blue: #2563eb;
   --color-brand-cyan: #22d3ee;
-  --color-brand-surface: #0f172a;
+  --color-brand-navy: var(--brand-navy);
+  --color-brand-surface: var(--brand-surface);
+  --color-text-base: var(--text-base);
+  --color-text-muted: var(--text-muted);
+}
+
+:root {
+  /* Antigravity Premium Dark Mode (Default) */
+  --brand-navy: #020617;
+  --brand-surface: #0f172a;
+  --text-base: #f8fafc;
+  --text-muted: #94a3b8;
+  --glass-bg: rgba(15, 23, 42, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --accent-glow: rgba(37, 99, 235, 0.2);
+}
+
+:root.light {
+  /* Premium Light Mode */
+  --brand-navy: #f8fafc;
+  --brand-surface: #ffffff;
+  --text-base: #0f172a;
+  --text-muted: #475569;
+  --glass-bg: rgba(255, 255, 255, 0.8);
+  --glass-border: rgba(15, 23, 42, 0.08);
+  --accent-glow: rgba(37, 99, 235, 0.1);
 }
 
 @layer base {
   body {
-    @apply bg-brand-navy text-white font-sans antialiased;
+    background-color: var(--brand-navy);
+    color: var(--text-base);
+    @apply font-sans antialiased transition-colors duration-300;
   }
   
   h1, h2, h3, h4 {
@@ -23,9 +49,9 @@
 }
 
 .glass {
-  background: rgba(30, 41, 59, 0.5);
+  background: var(--glass-bg);
   backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--glass-border);
 }
 
 .blue-glow {
@@ -37,7 +63,7 @@
 }
 
 .text-gradient {
-  background: linear-gradient(to right, #FFFFFF, #94a3b8);
+  background: linear-gradient(to right, var(--text-base), var(--text-muted));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }

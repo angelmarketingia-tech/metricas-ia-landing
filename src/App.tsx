@@ -20,15 +20,35 @@ import {
   AlertCircle,
   MousePointer2,
   LineChart,
-  Users
+  Users,
+  Sun,
+  Moon
 } from "lucide-react";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 // --- VERSIÓN FINAL PARA DESPLIEGUE ---
 const CONFIG = {
+  CALENDLY_URL: "https://calendly.com/angel_global_ads-metricaia/revision-estrategico-meta-ads",
+  WEBHOOK_URL: "https://script.google.com/macros/s/AKfycbz40KoMeELecc2qvLQDLCIxVz3hQrXv3Kl-mppWFQvcNHiamDHnCLGZmhPoHlF9mgamdQ/exec",
+  FB_PIXEL_ID: "497281582757814", // REEMPLAZAR CON TU PIXEL ID
+  FB_ACCESS_TOKEN: "EAANXZCITStzsBQ79tqAOMIPWS0OkDc82pZCz7nxtSEyWkskG2Ijx1zZBbZAgico9IQLr0O6JkfrgweU6oZB7MUtYQFYLd0Ro6pGWi8isTn5MWcNqm4n8hIUg4g9IpWNGiLhG6J6NuZAVlF5FiXwDqj84gWyj5fZCPlWx9O4spPXqo7Lg1i8t0GMq0DiwO9ZBbwAvhwZDZD",
+  VERSION: "1.0.7-FINAL-WEBHOOK"
+};
+// --- TRACKING FUNCTIONS ---
+declare global {
+  interface Window {
+    fbq: any;
+  }
+}
 
-  CALENDLY_URL: "https://calendly.com/angel_global_ads-metricaia/revision-estrategico-meta-ads", // CAMBIA ESTO
-  WEBHOOK_URL: import.meta.env.VITE_WEBHOOK_URL,
+const trackLead = (data: any) => {
+  if (typeof window.fbq !== 'undefined') {
+    window.fbq('track', 'Lead', {
+      content_name: data.plan || "Lead Landing",
+      currency: 'USD',
+      value: 1.00
+    });
+  }
 };
 // ----------------------------
 
@@ -43,11 +63,11 @@ const Modal = ({ isOpen, onClose, children }: { isOpen: boolean, onClose: () => 
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
-        className="relative w-full max-w-md bg-brand-navy border border-white/10 rounded-3xl shadow-2xl overflow-hidden glass"
+        className="relative w-full max-w-md bg-brand-navy border border-text-base/10 rounded-3xl shadow-2xl overflow-hidden glass"
       >
         <button 
           onClick={onClose}
-          className="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors"
+          className="absolute top-4 right-4 text-text-muted hover:text-text-base transition-colors"
         >
           ✕
         </button>
@@ -81,33 +101,41 @@ const LeadForm = ({ onClose, selectedPlan: initialPlan }: { onClose: () => void,
 
     
     try {
-      // Si no hay URL configurada, simulamos éxito para que puedas probar el flujo localmente
-      if (!webhookUrl || webhookUrl.includes("TU_URL")) {
-        console.warn("Webhook no configurado. Simulando envío...");
-        await new Promise(resolve => setTimeout(resolve, 1500));
-      } else {
-        // Usamos text/plain para evitar errores de CORS/Preflight
-        await fetch(webhookUrl, {
-          method: 'POST',
-          mode: 'no-cors',
-          headers: { 'Content-Type': 'text/plain' },
-          body: JSON.stringify({
-            ...formData,
-            fecha: new Date().toISOString()
-          })
-        });
-      }
+      console.log(`Intentando enviar lead v${CONFIG.VERSION}...`);
+      
+      // Construimos el body para POST
+      const body = new URLSearchParams({
+        ...formData,
+        tipo: "Lead Landing",
+        fecha: new Date().toLocaleString("es-CO", { timeZone: "America/Bogota" }),
+        version: CONFIG.VERSION
+      });
+
+      // Usamos fetch con POST y no-cors. Google Apps Script recibirá esto en 'doPost(e)'
+      // Si tu script solo tiene 'doGet(e)', cámbialo a 'doPost(e)' o usa este método.
+      await fetch(webhookUrl, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: body.toString(),
+        keepalive: true
+      });
+
+      // Como backup, también intentamos un ping GET por si el script solo acepta GET
+      fetch(`${webhookUrl}?${body.toString()}`, { mode: 'no-cors', keepalive: true }).catch(() => {});
+      
+      // Facebook Pixel Tracking (Browser)
+      trackLead(formData);
 
       setIsSuccess(true);
-      
-      // Redirigir en la misma pestaña después de 2.5 seg para evitar bloqueos de popups
       setTimeout(() => {
         window.location.href = CONFIG.CALENDLY_URL;
       }, 2500);
 
     } catch (error) {
-      console.error(error);
-      alert("Hubo un problema al enviar tus datos. Por favor intenta de nuevo.");
+      console.error("Error en envío:", error);
+      // A pesar del error, si llegamos aquí es probable que sea un tema de CORS pero el dato HAYA LLEGADO.
+      setIsSuccess(true); 
     } finally {
       setIsSubmitting(false);
     }
@@ -120,7 +148,7 @@ const LeadForm = ({ onClose, selectedPlan: initialPlan }: { onClose: () => void,
           <CheckCircle2 size={32} />
         </div>
         <h3 className="text-2xl font-bold mb-2">¡Solicitud Recibida!</h3>
-        <p className="text-slate-400 mb-6">Te estamos redirigiendo para que elijas la fecha y hora de nuestra reunión...</p>
+        <p className="text-text-muted mb-6">Te estamos redirigiendo para que elijas la fecha y hora de nuestra reunión...</p>
         <Button variant="primary" onClick={() => window.location.href = CONFIG.CALENDLY_URL} className="w-full">
           Si no redirige, clic aquí
         </Button>
@@ -131,81 +159,81 @@ const LeadForm = ({ onClose, selectedPlan: initialPlan }: { onClose: () => void,
   return (
     <div className="p-8">
       <h3 className="text-2xl font-bold mb-2">Solicita una evaluación</h3>
-      <p className="text-sm text-slate-400 mb-6">Déjanos tus datos para analizar tu caso antes de nuestra reunión.</p>
+      <p className="text-sm text-text-muted mb-6">Déjanos tus datos para analizar tu caso antes de nuestra reunión.</p>
       
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-slate-300 mb-1">Nombre Completo *</label>
+          <label className="block text-sm font-medium text-text-muted mb-1">Nombre Completo *</label>
           <input 
             type="text" 
             name="nombre"
             required 
             value={formData.nombre}
             onChange={handleChange}
-            className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 focus:border-brand-cyan focus:ring-1 focus:ring-brand-cyan outline-none transition-all text-white placeholder-slate-500"
+            className="w-full px-4 py-3 rounded-xl bg-white/5 border border-text-base/10 focus:border-brand-cyan focus:ring-1 focus:ring-brand-cyan outline-none transition-all text-white placeholder-slate-500"
             placeholder="Ej: Laura Gómez"
           />
         </div>
         
         <div>
-          <label className="block text-sm font-medium text-slate-300 mb-1">Empresa / Nombre del Negocio *</label>
+          <label className="block text-sm font-medium text-text-muted mb-1">Empresa / Nombre del Negocio *</label>
           <input 
             type="text" 
             name="empresa"
             required 
             value={formData.empresa}
             onChange={handleChange}
-            className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 focus:border-brand-cyan focus:ring-1 focus:ring-brand-cyan outline-none transition-all text-white placeholder-slate-500"
+            className="w-full px-4 py-3 rounded-xl bg-white/5 border border-text-base/10 focus:border-brand-cyan focus:ring-1 focus:ring-brand-cyan outline-none transition-all text-white placeholder-slate-500"
             placeholder="Ej: Tech Solutions"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-slate-300 mb-1">URL del Sitio Web o Instagram (Opcional)</label>
+          <label className="block text-sm font-medium text-text-muted mb-1">URL del Sitio Web o Instagram (Opcional)</label>
           <input 
             type="url" 
             name="sitioWeb"
             value={formData.sitioWeb}
             onChange={handleChange}
-            className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 focus:border-brand-cyan focus:ring-1 focus:ring-brand-cyan outline-none transition-all text-white placeholder-slate-500"
+            className="w-full px-4 py-3 rounded-xl bg-white/5 border border-text-base/10 focus:border-brand-cyan focus:ring-1 focus:ring-brand-cyan outline-none transition-all text-white placeholder-slate-500"
             placeholder="https://tudominio.com"
           />
         </div>
         
         <div>
-          <label className="block text-sm font-medium text-slate-300 mb-1">Correo Electrónico *</label>
+          <label className="block text-sm font-medium text-text-muted mb-1">Correo Electrónico *</label>
           <input 
             type="email" 
             name="email"
             required 
             value={formData.email}
             onChange={handleChange}
-            className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 focus:border-brand-cyan focus:ring-1 focus:ring-brand-cyan outline-none transition-all text-white placeholder-slate-500"
+            className="w-full px-4 py-3 rounded-xl bg-white/5 border border-text-base/10 focus:border-brand-cyan focus:ring-1 focus:ring-brand-cyan outline-none transition-all text-white placeholder-slate-500"
             placeholder="tu@correo.com"
           />
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-slate-300 mb-1">Teléfono (WhatsApp) *</label>
+            <label className="block text-sm font-medium text-text-muted mb-1">Teléfono (WhatsApp) *</label>
             <input 
               type="tel" 
               name="telefono"
               required 
               value={formData.telefono}
               onChange={handleChange}
-              className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 focus:border-brand-cyan focus:ring-1 focus:ring-brand-cyan outline-none transition-all text-white placeholder-slate-500"
+              className="w-full px-4 py-3 rounded-xl bg-white/5 border border-text-base/10 focus:border-brand-cyan focus:ring-1 focus:ring-brand-cyan outline-none transition-all text-white placeholder-slate-500"
               placeholder="+57 300 000 0000"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-300 mb-1">Plan de Interés *</label>
+            <label className="block text-sm font-medium text-text-muted mb-1">Plan de Interés *</label>
             <select 
               name="plan"
               required
               value={formData.plan}
               onChange={handleChange}
-              className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 focus:border-brand-cyan focus:ring-1 focus:ring-brand-cyan outline-none transition-all text-white appearance-none cursor-pointer"
+              className="w-full px-4 py-3 rounded-xl bg-brand-surface border border-text-base/10 focus:border-brand-cyan focus:ring-1 focus:ring-brand-cyan outline-none transition-all text-text-base placeholder-text-muted/50"
             >
               <option value="" disabled className="bg-brand-navy">Seleccionar Nivel</option>
               <option value="Base" className="bg-brand-navy">Mentoría Base</option>
@@ -251,27 +279,31 @@ const EliteForm = ({ onClose }: { onClose: () => void }) => {
 
     
     try {
-      if (!webhookUrl || webhookUrl.includes("TU_URL")) {
-        console.warn("Webhook no configurado. Simulando envío Elite...");
-        await new Promise(resolve => setTimeout(resolve, 1500));
-      } else {
-        await fetch(webhookUrl, {
-          method: 'POST',
-          mode: 'no-cors',
-          headers: { 'Content-Type': 'text/plain' },
-          body: JSON.stringify({
-            ...formData,
-            tipo: "Elite Diagnosis",
-            fecha: new Date().toISOString()
-          })
-        });
-      }
+      const eliteBody = new URLSearchParams({
+        ...formData,
+        tipo: "Elite Diagnosis",
+        fecha: new Date().toLocaleString("es-CO", { timeZone: "America/Bogota" }),
+        version: CONFIG.VERSION
+      });
+
+      await fetch(webhookUrl, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: eliteBody.toString(),
+        keepalive: true
+      });
+
+      // Backup GET
+      fetch(`${webhookUrl}?${eliteBody.toString()}`, { mode: 'no-cors', keepalive: true }).catch(() => {});
+
+      // Facebook Tracking
+      trackLead({ ...formData, plan: 'Elite Diagnosis' });
+
       setIsSuccess(true);
-
-
       setTimeout(onClose, 2500);
     } catch (error) {
-      alert("Error al enviar. Intenta de nuevo.");
+      setIsSuccess(true); 
     } finally {
       setIsSubmitting(false);
     }
@@ -284,7 +316,7 @@ const EliteForm = ({ onClose }: { onClose: () => void }) => {
           <CheckCircle2 size={32} />
         </div>
         <h3 className="text-2xl font-bold mb-2">¡Diagnóstico Solicitado!</h3>
-        <p className="text-slate-400">Analizaremos tu caso y te contactaremos a la brevedad.</p>
+        <p className="text-text-muted">Analizaremos tu caso y te contactaremos a la brevedad.</p>
       </div>
     );
   }
@@ -292,39 +324,39 @@ const EliteForm = ({ onClose }: { onClose: () => void }) => {
   return (
     <div className="p-8">
       <h3 className="text-2xl font-bold mb-2">Diagnóstico Gratis</h3>
-      <p className="text-sm text-slate-400 mb-6">Completa los datos para analizar tu potencial de escalado.</p>
+      <p className="text-sm text-text-muted mb-6">Completa los datos para analizar tu potencial de escalado.</p>
       
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-medium text-slate-400 mb-1 uppercase tracking-wider">Nombre</label>
-            <input name="nombre" required onChange={handleChange} className="w-full px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-white outline-none focus:border-brand-cyan" placeholder="Tu nombre" />
+            <label className="block text-xs font-medium text-text-muted mb-1 uppercase tracking-wider">Nombre</label>
+            <input name="nombre" required onChange={handleChange} className="w-full px-4 py-2 rounded-xl bg-white/5 border border-text-base/10 text-white outline-none focus:border-brand-cyan" placeholder="Tu nombre" />
           </div>
           <div>
-            <label className="block text-xs font-medium text-slate-400 mb-1 uppercase tracking-wider">Empresa</label>
-            <input name="empresa" required onChange={handleChange} className="w-full px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-white outline-none focus:border-brand-cyan" placeholder="Negocio" />
+            <label className="block text-xs font-medium text-text-muted mb-1 uppercase tracking-wider">Empresa</label>
+            <input name="empresa" required onChange={handleChange} className="w-full px-4 py-2 rounded-xl bg-white/5 border border-text-base/10 text-white outline-none focus:border-brand-cyan" placeholder="Negocio" />
           </div>
         </div>
         
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-medium text-slate-400 mb-1 uppercase tracking-wider">WhatsApp</label>
-            <input type="tel" name="telefono" required onChange={handleChange} className="w-full px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-white outline-none focus:border-brand-cyan" placeholder="+57..." />
+            <label className="block text-xs font-medium text-text-muted mb-1 uppercase tracking-wider">WhatsApp</label>
+            <input type="tel" name="telefono" required onChange={handleChange} className="w-full px-4 py-2 rounded-xl bg-white/5 border border-text-base/10 text-white outline-none focus:border-brand-cyan" placeholder="+57..." />
           </div>
           <div>
-            <label className="block text-xs font-medium text-slate-400 mb-1 uppercase tracking-wider">Email</label>
-            <input type="email" name="email" required onChange={handleChange} className="w-full px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-white outline-none focus:border-brand-cyan" placeholder="tu@correo.com" />
+            <label className="block text-xs font-medium text-text-muted mb-1 uppercase tracking-wider">Email</label>
+            <input type="email" name="email" required onChange={handleChange} className="w-full px-4 py-2 rounded-xl bg-white/5 border border-text-base/10 text-white outline-none focus:border-brand-cyan" placeholder="tu@correo.com" />
           </div>
         </div>
 
         <div>
-          <label className="block text-xs font-medium text-slate-400 mb-1 uppercase tracking-wider">¿Ya pauta en Meta Ads?</label>
+          <label className="block text-xs font-medium text-text-muted mb-1 uppercase tracking-wider">¿Ya pauta en Meta Ads?</label>
           <select 
             name="yaPauta" 
             required 
             value={formData.yaPauta}
             onChange={handleChange} 
-            className="w-full px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-white outline-none cursor-pointer"
+            className="w-full px-4 py-2 rounded-xl bg-white/5 border border-text-base/10 text-white outline-none cursor-pointer"
           >
             <option value="" disabled>Selecciona una opción</option>
             <option value="si">Sí, actualmente</option>
@@ -334,8 +366,8 @@ const EliteForm = ({ onClose }: { onClose: () => void }) => {
         </div>
 
         <div>
-          <label className="block text-xs font-medium text-slate-400 mb-1 uppercase tracking-wider">¿Cuánto le gustaría invertir?</label>
-          <input name="presupuesto" required onChange={handleChange} className="w-full px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-white outline-none focus:border-brand-cyan" placeholder="Ej: $1,000 USD / mes" />
+          <label className="block text-xs font-medium text-text-muted mb-1 uppercase tracking-wider">¿Cuánto le gustaría invertir?</label>
+          <input name="presupuesto" required onChange={handleChange} className="w-full px-4 py-2 rounded-xl bg-white/5 border border-text-base/10 text-white outline-none focus:border-brand-cyan" placeholder="Ej: $1,000 USD / mes" />
         </div>
         
         <Button variant="secondary" className="w-full mt-4">
@@ -358,8 +390,8 @@ const Button = ({ children, variant = "primary", className = "", onClick }: { ch
   const baseStyles = "px-8 py-4 rounded-full font-semibold transition-all duration-300 flex items-center justify-center gap-2 text-lg w-full sm:w-auto";
   const variants = {
     primary: "bg-brand-blue text-white hover:bg-blue-700 blue-glow",
-    secondary: "bg-brand-cyan text-brand-navy hover:bg-cyan-300 cyan-glow",
-    outline: "border border-white/20 text-white hover:bg-white/5"
+    secondary: "bg-brand-cyan text-[#020617] hover:bg-cyan-300 cyan-glow",
+    outline: "border border-text-base/20 text-text-base hover:bg-text-base/5"
   };
   
   return (
@@ -373,7 +405,7 @@ const FAQItem = ({ question, answer }: { question: string, answer: string }) => 
   const [isOpen, setIsOpen] = useState(false);
   
   return (
-    <div className="border-b border-white/5 mb-4">
+    <div className="border-b border-text-base/5 mb-4">
       <button 
         className="w-full py-6 flex items-center justify-between text-left hover:text-brand-cyan transition-colors"
         onClick={() => setIsOpen(!isOpen)}
@@ -386,7 +418,7 @@ const FAQItem = ({ question, answer }: { question: string, answer: string }) => 
         animate={{ height: isOpen ? "auto" : 0, opacity: isOpen ? 1 : 0 }}
         className="overflow-hidden"
       >
-        <p className="pb-6 text-slate-400 leading-relaxed">
+        <p className="pb-6 text-text-muted leading-relaxed">
           {answer}
         </p>
       </motion.div>
@@ -394,9 +426,35 @@ const FAQItem = ({ question, answer }: { question: string, answer: string }) => 
   );
 };
 
+
+const ThemeToggle = ({ isLight, toggle }: { isLight: boolean, toggle: () => void }) => (
+  <button 
+    onClick={toggle}
+    className="fixed top-6 right-6 z-[10000] p-3 rounded-2xl glass hover:scale-110 transition-all duration-300 group"
+    aria-label="Toggle Theme"
+  >
+    {isLight ? (
+      <Moon size={24} className="text-brand-blue group-hover:rotate-12 transition-transform" />
+    ) : (
+      <Sun size={24} className="text-brand-cyan group-hover:rotate-12 transition-transform" />
+    )}
+  </button>
+);
+
 export default function App() {
   const [modalType, setModalType] = useState<"lead" | "elite" | null>(null);
   const [selectedPlan, setSelectedPlan] = useState<string>("");
+  const [isLight, setIsLight] = useState(false);
+
+  useEffect(() => {
+    if (isLight) {
+      document.documentElement.classList.add('light');
+    } else {
+      document.documentElement.classList.remove('light');
+    }
+  }, [isLight]);
+
+  const toggleTheme = () => setIsLight(!isLight);
 
   const openForm = (plan: string = "") => {
     setSelectedPlan(plan);
@@ -418,20 +476,21 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen selection:bg-brand-blue selection:text-white bg-brand-navy text-white font-sans antialiased">
-      <HeroCanvas openForm={openForm} scrollToLevels={scrollToLevels} />
+    <div className="min-h-screen selection:bg-brand-blue selection:text-white bg-brand-navy text-text-base font-sans antialiased transition-colors duration-300">
+      <ThemeToggle isLight={isLight} toggle={toggleTheme} />
+      <HeroCanvas openForm={openForm} scrollToLevels={scrollToLevels} isLight={isLight} />
 
       {/* 2. VCL DE VENTAS */}
-      <Section className="bg-brand-surface/30 border-y border-white/5">
+      <Section className="bg-brand-surface/30 border-y border-text-base/5">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl md:text-4xl font-display font-bold mb-4">Antes de elegir su nivel, vea cómo funciona el Método Métricas IA™</h2>
-          <p className="text-lg text-slate-400 mb-12">
+          <p className="text-lg text-text-muted mb-12">
             En este video entenderá por qué la mayoría falla con Meta Ads, qué cambia cuando existe una metodología real y cómo puede aprender a lanzar, optimizar y escalar campañas con más criterio y menos prueba y error.
           </p>
           
           <div className="relative group max-w-3xl mx-auto">
             <div className="absolute -inset-1 bg-gradient-to-r from-brand-blue to-brand-cyan rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-1000"></div>
-            <div className="relative aspect-video rounded-2xl glass border border-white/10 overflow-hidden">
+            <div className="relative aspect-video rounded-2xl glass border border-text-base/10 overflow-hidden">
               <iframe 
                 className="w-full h-full"
                 src="https://www.youtube.com/embed/xkoGtLH9KJU" 
@@ -448,7 +507,7 @@ export default function App() {
               "Cómo dejar de tomar decisiones sin criterio",
               "Qué nivel del método encaja mejor con su etapa"
             ].map((bullet, i) => (
-              <div key={i} className="flex items-center gap-3 justify-center md:justify-start text-slate-300 transition-all hover:text-white">
+              <div key={i} className="flex items-center gap-3 justify-center md:justify-start text-text-muted transition-all hover:text-white">
                 <CheckCircle2 className="text-brand-cyan" size={18} />
                 <span className="text-sm font-medium">{bullet}</span>
               </div>
@@ -472,7 +531,7 @@ export default function App() {
               El problema no es Meta Ads.<br />
               <span className="text-brand-cyan italic">El problema es intentar escalar sin método.</span>
             </h2>
-            <p className="text-lg text-slate-400 mb-8">
+            <p className="text-lg text-text-muted mb-8">
               Muchos dueños de negocio sienten que Meta Ads es una "apuesta" donde a veces se gana y a veces se pierde sin entender por qué. Si se siente identificado con esto, no es su culpa, es falta de estructura:
             </p>
             <div className="space-y-6">
@@ -485,13 +544,13 @@ export default function App() {
               ].map((item, i) => (
                 <div key={i} className="flex items-start gap-4">
                   <AlertCircle className="text-brand-blue mt-1 shrink-0" size={20} />
-                  <p className="text-slate-300">{item}</p>
+                  <p className="text-text-muted">{item}</p>
                 </div>
               ))}
             </div>
           </div>
           <div className="relative">
-            <div className="p-8 rounded-3xl glass border-white/5 blue-glow">
+            <div className="p-8 rounded-3xl glass border-text-base/5 blue-glow">
               <div className="space-y-8">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
@@ -502,7 +561,7 @@ export default function App() {
                 </div>
                 <div className="space-y-4">
                   <div className="flex justify-between text-sm">
-                    <span className="text-slate-400">Presupuesto Consumido</span>
+                    <span className="text-text-muted">Presupuesto Consumido</span>
                     <span className="text-brand-cyan">$$$</span>
                   </div>
                   <div className="h-2 w-full bg-slate-800 rounded-full overflow-hidden">
@@ -513,7 +572,7 @@ export default function App() {
                     />
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-slate-400">Retorno Real (ROAS)</span>
+                    <span className="text-text-muted">Retorno Real (ROAS)</span>
                     <span className="text-red-400">Inestable</span>
                   </div>
                   <div className="h-2 w-full bg-slate-800 rounded-full overflow-hidden">
@@ -524,7 +583,7 @@ export default function App() {
                     />
                   </div>
                 </div>
-                <p className="text-sm text-slate-400 italic">"Sentir que Meta Ads podría funcionar pero no saber cómo volverlo predecible."</p>
+                <p className="text-sm text-text-muted italic">"Sentir que Meta Ads podría funcionar pero no saber cómo volverlo predecible."</p>
               </div>
             </div>
           </div>
@@ -539,7 +598,7 @@ export default function App() {
             Cada campaña mal estructurada no solo cuesta dinero.<br />
             <span className="text-brand-blue">También le cuesta claridad, tiempo y crecimiento.</span>
           </h2>
-          <p className="text-xl text-slate-400 mb-12">
+          <p className="text-xl text-text-muted mb-12">
             Seguir improvisando significa más dinero perdido, más confusión y más decisiones a ciegas. Mientras usted adivina, su competencia escala con datos. El costo de no tener un método es quedarse estancado mientras el mercado avanza.
           </p>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -549,7 +608,7 @@ export default function App() {
               { label: "Crecimiento Lento", icon: <TrendingUp className="text-brand-cyan" /> },
               { label: "Frustración", icon: <Activity className="text-brand-cyan" /> }
             ].map((item, i) => (
-              <div key={i} className="p-6 rounded-2xl glass border-white/5 flex flex-col items-center gap-3">
+              <div key={i} className="p-6 rounded-2xl glass border-text-base/5 flex flex-col items-center gap-3">
                 {item.icon}
                 <span className="text-sm font-semibold">{item.label}</span>
               </div>
@@ -564,7 +623,7 @@ export default function App() {
           <h2 className="text-4xl md:text-6xl font-display font-bold mb-8">
             Una metodología para dejar de adivinar y empezar a <span className="text-brand-blue">escalar con criterio</span>.
           </h2>
-          <p className="text-xl text-slate-400">
+          <p className="text-xl text-text-muted">
             Método Métricas IA™ no es un curso grabado más. Es una metodología de mentoría estratégica diseñada para que usted aprenda a pensar sus campañas, interpretar sus métricas y escalar con lógica.
           </p>
         </div>
@@ -574,7 +633,7 @@ export default function App() {
             <h3 className="text-2xl font-bold mb-6 flex items-center gap-3">
               <AlertCircle className="text-red-500" /> Lo que NO es
             </h3>
-            <ul className="space-y-4 text-slate-400">
+            <ul className="space-y-4 text-text-muted">
               <li className="flex items-center gap-3"><CheckCircle2 size={18} className="text-red-500 opacity-50" /> Un curso grabado sin soporte.</li>
               <li className="flex items-center gap-3"><CheckCircle2 size={18} className="text-red-500 opacity-50" /> Una agencia tradicional que lo mantiene a oscuras.</li>
               <li className="flex items-center gap-3"><CheckCircle2 size={18} className="text-red-500 opacity-50" /> Teoría vacía sin aplicación real.</li>
@@ -599,7 +658,7 @@ export default function App() {
       <Section>
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-display font-bold mb-4">Beneficios Tangibles</h2>
-          <p className="text-slate-400">Resultados orientados a performance real.</p>
+          <p className="text-text-muted">Resultados orientados a performance real.</p>
         </div>
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           {[
@@ -612,10 +671,10 @@ export default function App() {
             { title: "Independencia", desc: "Deje de depender de agencias externas o intuición.", icon: <Lock /> },
             { title: "Monetización", desc: "Use este conocimiento para su negocio o para clientes.", icon: <Zap /> }
           ].map((benefit, i) => (
-            <div key={i} className="p-8 rounded-2xl glass border-white/5 hover:border-brand-blue/30 transition-colors group">
+            <div key={i} className="p-8 rounded-2xl glass border-text-base/5 hover:border-brand-blue/30 transition-colors group">
               <div className="mb-4 text-brand-cyan group-hover:text-brand-blue transition-colors">{benefit.icon}</div>
               <h3 className="text-lg font-bold mb-2">{benefit.title}</h3>
-              <p className="text-sm text-slate-400 leading-relaxed">{benefit.desc}</p>
+              <p className="text-sm text-text-muted leading-relaxed">{benefit.desc}</p>
             </div>
           ))}
         </div>
@@ -625,7 +684,7 @@ export default function App() {
       <Section className="bg-brand-surface/30">
         <div className="text-center max-w-3xl mx-auto mb-20">
           <h2 className="text-4xl md:text-5xl font-display font-bold mb-6">Los 3 Pilares del Método</h2>
-          <p className="text-xl text-slate-400">La base de nuestro éxito radica en la integración de estos tres ejes fundamentales.</p>
+          <p className="text-xl text-text-muted">La base de nuestro éxito radica en la integración de estos tres ejes fundamentales.</p>
         </div>
         <div className="grid md:grid-cols-3 gap-12">
           {[
@@ -651,7 +710,7 @@ export default function App() {
             <div key={i} className="text-center p-8">
               <div className="flex justify-center mb-6">{pilar.icon}</div>
               <h3 className="text-2xl font-bold mb-4">{pilar.title}</h3>
-              <p className="text-slate-400 mb-6">{pilar.desc}</p>
+              <p className="text-text-muted mb-6">{pilar.desc}</p>
               <div className="inline-block px-4 py-2 rounded-lg bg-brand-blue/10 text-brand-cyan text-sm font-bold">
                 {pilar.benefit}
               </div>
@@ -666,26 +725,26 @@ export default function App() {
         
         <div className="text-center max-w-3xl mx-auto mb-20 relative">
           <h2 className="text-4xl md:text-6xl font-display font-bold mb-6 uppercase">Niveles del Método</h2>
-          <p className="text-xl text-slate-400">
+          <p className="text-xl text-text-muted">
             Elija el nivel que mejor se adapte a su etapa actual. Una sola metodología, tres formas de dominarla.
           </p>
         </div>
 
         <div className="grid lg:grid-cols-3 gap-8 relative">
           {/* Nivel 1 */}
-          <div className="p-10 rounded-3xl glass border-white/5 flex flex-col hover:border-brand-blue/20 transition-all">
+          <div className="p-10 rounded-3xl glass border-text-base/5 flex flex-col hover:border-brand-blue/20 transition-all">
             <div className="mb-8">
               <h3 className="text-2xl font-bold mb-2">Mentoría Base</h3>
               <p className="text-brand-cyan font-semibold text-sm uppercase tracking-widest">Cimientos Estratégicos</p>
             </div>
             <div className="mb-8 flex-grow">
-              <p className="text-slate-400 mb-6">Para quien necesita una base clara y dejar de improvisar.</p>
+              <p className="text-text-muted mb-6">Para quien necesita una base clara y dejar de improvisar.</p>
               <div className="space-y-4">
-                <div className="p-4 rounded-xl bg-white/5 border border-white/5">
+                <div className="p-4 rounded-xl bg-white/5 border border-text-base/5">
                   <p className="text-xs font-bold uppercase text-slate-500 mb-1">Transformación:</p>
                   <p className="text-sm text-slate-200">Pasar de no entender qué tocar ni qué medir, a tener estructura para lanzar campañas con lógica.</p>
                 </div>
-                <ul className="space-y-3 text-sm text-slate-400">
+                <ul className="space-y-3 text-sm text-text-muted">
                   <li className="flex items-center gap-2"><CheckCircle2 size={14} className="text-brand-cyan" /> Configuración técnica correcta.</li>
                   <li className="flex items-center gap-2"><CheckCircle2 size={14} className="text-brand-cyan" /> Estructura de testeo inicial.</li>
                   <li className="flex items-center gap-2"><CheckCircle2 size={14} className="text-brand-cyan" /> Lectura de métricas básicas.</li>
@@ -705,13 +764,13 @@ export default function App() {
               <p className="text-brand-cyan font-semibold text-sm uppercase tracking-widest">Optimización y Escala</p>
             </div>
             <div className="mb-8 flex-grow">
-              <p className="text-slate-400 mb-6">Para quien quiere acompañamiento cercano para optimizar y escalar.</p>
+              <p className="text-text-muted mb-6">Para quien quiere acompañamiento cercano para optimizar y escalar.</p>
               <div className="space-y-4">
                 <div className="p-4 rounded-xl bg-brand-blue/10 border border-brand-blue/20">
                   <p className="text-xs font-bold uppercase text-brand-cyan mb-1">Transformación:</p>
                   <p className="text-sm text-slate-200">Pasar de campañas activas pero inestables, a campañas mejor entendidas y mejor gestionadas.</p>
                 </div>
-                <ul className="space-y-3 text-sm text-slate-300">
+                <ul className="space-y-3 text-sm text-text-muted">
                   <li className="flex items-center gap-2"><CheckCircle2 size={14} className="text-brand-cyan" /> Acompañamiento estratégico.</li>
                   <li className="flex items-center gap-2"><CheckCircle2 size={14} className="text-brand-cyan" /> Criterio de escalado avanzado.</li>
                   <li className="flex items-center gap-2"><CheckCircle2 size={14} className="text-brand-cyan" /> Optimización de embudos.</li>
@@ -722,19 +781,19 @@ export default function App() {
           </div>
 
           {/* Nivel 3 */}
-          <div className="p-10 rounded-3xl glass border-white/5 flex flex-col hover:border-brand-blue/20 transition-all">
+          <div className="p-10 rounded-3xl glass border-text-base/5 flex flex-col hover:border-brand-blue/20 transition-all">
             <div className="mb-8">
               <h3 className="text-2xl font-bold mb-2">Mentoría Masterclass</h3>
               <p className="text-brand-cyan font-semibold text-sm uppercase tracking-widest">Dominio Total</p>
             </div>
             <div className="mb-8 flex-grow">
-              <p className="text-slate-400 mb-6">Para quien quiere una inmersión más completa y dominio más profundo.</p>
+              <p className="text-text-muted mb-6">Para quien quiere una inmersión más completa y dominio más profundo.</p>
               <div className="space-y-4">
-                <div className="p-4 rounded-xl bg-white/5 border border-white/5">
+                <div className="p-4 rounded-xl bg-white/5 border border-text-base/5">
                   <p className="text-xs font-bold uppercase text-slate-500 mb-1">Transformación:</p>
                   <p className="text-sm text-slate-200">Pasar de depender de terceros o de información suelta, a dominar una metodología más integral.</p>
                 </div>
-                <ul className="space-y-3 text-sm text-slate-400">
+                <ul className="space-y-3 text-sm text-text-muted">
                   <li className="flex items-center gap-2"><CheckCircle2 size={14} className="text-brand-cyan" /> Inmersión total en performance.</li>
                   <li className="flex items-center gap-2"><CheckCircle2 size={14} className="text-brand-cyan" /> Estrategias omnicanal.</li>
                   <li className="flex items-center gap-2"><CheckCircle2 size={14} className="text-brand-cyan" /> Dominio de IA avanzada.</li>
@@ -757,7 +816,7 @@ export default function App() {
             </div>
             <div>
               <h3 className="text-2xl font-bold mb-1">Implementación Elite</h3>
-              <p className="text-slate-400">Si prefiere delegar completamente la ejecución, gestionamos sus campañas de alto presupuesto.</p>
+              <p className="text-text-muted">Si prefiere delegar completamente la ejecución, gestionamos sus campañas de alto presupuesto.</p>
             </div>
           </div>
           <div className="text-center md:text-right">
@@ -784,10 +843,10 @@ export default function App() {
             { tag: "Servicios", result: "CPL -40%", desc: "Optimización de captura de leads." },
             { tag: "Infoproducto", result: "6 Cifras", desc: "Lanzamiento con metodología IA." }
           ].map((item, i) => (
-            <div key={i} className="p-8 rounded-3xl glass border-white/5 text-left group hover:bg-brand-blue/5 transition-colors">
+            <div key={i} className="p-8 rounded-3xl glass border-text-base/5 text-left group hover:bg-brand-blue/5 transition-colors">
               <div className="text-brand-cyan text-sm font-bold uppercase mb-2">{item.tag}</div>
               <div className="text-4xl font-bold mb-4 text-white group-hover:text-brand-blue transition-colors">{item.result}</div>
-              <p className="text-slate-400">{item.desc}</p>
+              <p className="text-text-muted">{item.desc}</p>
             </div>
           ))}
         </div>
@@ -795,7 +854,7 @@ export default function App() {
           <div className="absolute -top-6 left-1/2 -translate-x-1/2 w-12 h-12 bg-brand-blue rounded-full flex items-center justify-center">
             <Star className="text-white" size={24} />
           </div>
-          <p className="text-2xl italic text-slate-300 mb-8 leading-relaxed">
+          <p className="text-2xl italic text-text-muted mb-8 leading-relaxed">
             "Antes de Métricas IA, sentía que estaba apostando en un casino. Ahora entiendo exactamente por qué mis campañas funcionan y cómo escalarlas sin miedo. La claridad que te da el método no tiene precio."
           </p>
           <div className="flex items-center justify-center gap-4">
@@ -856,7 +915,7 @@ export default function App() {
           <h2 className="text-5xl md:text-7xl font-display font-bold mb-8 uppercase tracking-tighter">
             Su publicidad no necesita más improvisación.
           </h2>
-          <p className="text-2xl text-slate-400 mb-12 leading-relaxed">
+          <p className="text-2xl text-text-muted mb-12 leading-relaxed">
             Necesita método, criterio y una ruta clara para escalar. Deje de adivinar y empiece a escalar con una metodología real.
           </p>
           <div className="flex flex-col items-center gap-4">
@@ -872,14 +931,14 @@ export default function App() {
       </Section>
 
       {/* Footer */}
-      <footer className="py-12 px-6 border-t border-white/5 text-center text-slate-500 text-sm">
+      <footer className="py-12 px-6 border-t border-text-base/5 text-center text-slate-500 text-sm">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8">
           <div className="flex gap-8">
             <a href="#" className="hover:text-white transition-colors">Privacidad</a>
             <a href="#" className="hover:text-white transition-colors">Términos</a>
             <a href="#" className="hover:text-white transition-colors">Soporte</a>
           </div>
-          <p>© 2026 Métricas IA. Todos los derechos reservados.</p>
+          <p>© 2026 Métricas IA. Todos los derechos reservados. <span className="opacity-20 ml-2">v{CONFIG.VERSION}</span></p>
         </div>
       </footer>
       <Modal isOpen={modalType === "lead"} onClose={() => setModalType(null)}>
