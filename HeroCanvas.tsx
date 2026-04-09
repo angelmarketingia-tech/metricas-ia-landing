@@ -126,35 +126,44 @@ export const HeroCanvas = ({ openForm, scrollToLevels, isLight }: { openForm: (p
         )}
 
         {/* Hero Content Overlay */}
-        <motion.div 
+        <motion.div
           style={{ opacity: textOpacity }}
           className="absolute inset-0 flex flex-col items-center pt-32 md:pt-48 px-6 text-center max-w-5xl mx-auto z-10 pointer-events-none"
         >
-          <h1 className="text-4xl md:text-6xl lg:text-7xl font-display font-bold leading-[1.1] mb-8 tracking-tight uppercase drop-shadow-[0_4px_4px_rgba(0,0,0,0.8)] pointer-events-auto">
-            DEJA DE IMPROVISAR CON META ADS.<br />
-            <span className="text-brand-blue">APRENDE A LANZAR, OPTIMIZAR Y ESCALAR</span> CAMPAÑAS RENTABLES CON IA Y ACOMPAÑAMIENTO REAL.
-          </h1>
-          <p className="text-xl md:text-2xl text-slate-300 mb-12 leading-relaxed max-w-4xl mx-auto drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)] pointer-events-auto">
-            Método Métricas IA™ es una metodología de mentoría estratégica en 3 niveles para dueños de negocio, emprendedores y marcas que quieren dejar de perder dinero en anuncios, entender qué funciona de verdad y escalar con más claridad, control y retorno.
-          </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pointer-events-auto">
-            <button 
-              onClick={() => openForm()}
-              className="px-8 py-4 rounded-full font-semibold transition-all duration-300 flex items-center justify-center gap-2 text-lg w-full sm:w-auto bg-brand-blue text-white hover:bg-blue-700 blue-glow"
+          {/* Panel oscuro detrás del texto para legibilidad */}
+          <div className="bg-black/50 backdrop-blur-[3px] rounded-3xl px-8 py-8 mb-6 pointer-events-auto" style={{ boxShadow: '0 0 60px 20px rgba(0,0,0,0.5)' }}>
+            <h1
+              className="text-4xl md:text-6xl lg:text-7xl font-display font-bold leading-[1.1] mb-6 tracking-tight uppercase text-white"
+              style={{ textShadow: '0 0 30px rgba(0,0,0,1), 0 2px 8px rgba(0,0,0,1), 0 0 60px rgba(0,0,0,0.9)' }}
             >
-              Quiero ver qué nivel es para mí
-              <ArrowRight size={20} />
-            </button>
-            <button 
-              onClick={scrollToLevels}
-              className="px-8 py-4 rounded-full font-semibold transition-all duration-300 flex items-center justify-center gap-2 text-lg w-full sm:w-auto border border-text-base/20 text-text-base hover:bg-text-base/5 backdrop-blur-sm"
+              DEJA DE IMPROVISAR CON META ADS.<br />
+              <span className="text-brand-blue" style={{ textShadow: '0 0 20px rgba(0,0,0,1), 0 2px 8px rgba(0,0,0,1), 0 0 40px rgba(59,130,246,0.4)' }}>APRENDE A LANZAR, OPTIMIZAR Y ESCALAR</span> CAMPAÑAS RENTABLES CON IA Y ACOMPAÑAMIENTO REAL.
+            </h1>
+            <p
+              className="text-xl md:text-2xl text-slate-200 mb-8 leading-relaxed max-w-4xl mx-auto"
+              style={{ textShadow: '0 1px 6px rgba(0,0,0,1), 0 0 20px rgba(0,0,0,0.9)' }}
             >
-              Explorar Niveles
-            </button>
+              Método Métricas IA™ es una metodología de mentoría estratégica en 3 niveles para dueños de negocio, emprendedores y marcas que quieren dejar de perder dinero en anuncios, entender qué funciona de verdad y escalar con más claridad, control y retorno.
+            </p>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pointer-events-auto">
+              <button
+                onClick={() => openForm()}
+                className="px-8 py-4 rounded-full font-semibold transition-all duration-300 flex items-center justify-center gap-2 text-lg w-full sm:w-auto bg-brand-blue text-white hover:bg-blue-700 blue-glow"
+              >
+                Quiero ver qué nivel es para mí
+                <ArrowRight size={20} />
+              </button>
+              <button
+                onClick={scrollToLevels}
+                className="px-8 py-4 rounded-full font-semibold transition-all duration-300 flex items-center justify-center gap-2 text-lg w-full sm:w-auto border border-white/30 text-white hover:bg-white/10 backdrop-blur-sm"
+              >
+                Explorar Niveles
+              </button>
+            </div>
+            <p className="text-sm text-slate-300 font-medium mt-4" style={{ textShadow: '0 1px 4px rgba(0,0,0,1)' }}>
+              Descubre cuál nivel encaja con tu etapa y cómo empezar a escalar con criterio.
+            </p>
           </div>
-          <p className="text-sm text-slate-300 font-medium drop-shadow-md mt-4">
-            Descubre cuál nivel encaja con tu etapa y cómo empezar a escalar con criterio.
-          </p>
         </motion.div>
       </div>
     </div>
