@@ -126,34 +126,62 @@ export const HeroCanvas = ({ openForm, scrollToLevels, isLight }: { openForm: (p
         )}
 
         {/* Hero Content Overlay */}
-        <motion.div 
+        <motion.div
           style={{ opacity: textOpacity }}
-          className="absolute inset-0 flex flex-col items-center pt-32 md:pt-48 px-6 text-center max-w-5xl mx-auto z-10 pointer-events-none"
+          className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center max-w-4xl mx-auto z-10 pointer-events-none"
         >
-          <h1 className="text-4xl md:text-6xl lg:text-7xl font-display font-bold leading-[1.1] mb-8 tracking-tight uppercase drop-shadow-[0_4px_4px_rgba(0,0,0,0.8)] pointer-events-auto">
-            DEJA DE IMPROVISAR CON META ADS.<br />
-            <span className="text-brand-blue">APRENDE A LANZAR, OPTIMIZAR Y ESCALAR</span> CAMPAÑAS RENTABLES CON IA Y ACOMPAÑAMIENTO REAL.
+          {/* Pre-headline tensión */}
+          <div className="mb-4 pointer-events-auto">
+            <span
+              className="font-mono text-xs tracking-[0.2em] uppercase px-3 py-1.5 rounded-full"
+              style={{ color: '#22d3ee', background: 'rgba(34,211,238,0.08)', border: '1px solid rgba(34,211,238,0.2)', textShadow: '0 0 20px rgba(0,0,0,1)' }}
+            >
+              Tu competencia ya tiene método. ¿Sigues improvisando?
+            </span>
+          </div>
+
+          {/* HEADLINE principal — transformación + monetización */}
+          <h1
+            className="text-4xl md:text-5xl lg:text-[4.25rem] font-display font-bold leading-[1.08] mb-5 tracking-tight text-white pointer-events-auto"
+            style={{ textShadow: '0 0 60px rgba(0,0,0,1), 0 4px 16px rgba(0,0,0,1), 0 0 120px rgba(0,0,0,0.95)' }}
+          >
+            Deja de improvisar en Meta Ads<br />
+            <span
+              className="text-brand-blue"
+              style={{ textShadow: '0 0 40px rgba(0,0,0,1), 0 4px 16px rgba(0,0,0,1), 0 0 60px rgba(37,99,235,0.4)' }}
+            >
+              y conviértelo en una habilidad<br />rentable que puedes vender.
+            </span>
           </h1>
-          <p className="text-xl md:text-2xl text-slate-300 mb-12 leading-relaxed max-w-4xl mx-auto drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)] pointer-events-auto">
-            Método Métricas IA™ es una metodología de mentoría estratégica en 3 niveles para dueños de negocio, emprendedores y marcas que quieren dejar de perder dinero en anuncios, entender qué funciona de verdad y escalar con más claridad, control y retorno.
-          </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pointer-events-auto">
-            <button 
-              onClick={() => openForm()}
-              className="px-8 py-4 rounded-full font-semibold transition-all duration-300 flex items-center justify-center gap-2 text-lg w-full sm:w-auto bg-brand-blue text-white hover:bg-blue-700 blue-glow"
-            >
-              Quiero ver qué nivel es para mí
-              <ArrowRight size={20} />
-            </button>
-            <button 
+
+          {/* Subheadline — legible sobre fondo */}
+          <div
+            className="mb-8 px-5 py-3 rounded-2xl pointer-events-auto max-w-xl mx-auto"
+            style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.09)' }}
+          >
+            <p className="text-sm md:text-base text-slate-200 leading-relaxed text-center">
+              Aprende con estructura real, <span className="text-brand-cyan font-semibold">IA aplicada</span> y acompañamiento cercano — para dominar una habilidad de alto valor y monetizarla más rápido.
+            </p>
+          </div>
+
+          {/* CTA único */}
+          <div className="pointer-events-auto">
+            <button
               onClick={scrollToLevels}
-              className="px-8 py-4 rounded-full font-semibold transition-all duration-300 flex items-center justify-center gap-2 text-lg w-full sm:w-auto border border-text-base/20 text-text-base hover:bg-text-base/5 backdrop-blur-sm"
+              className="group px-10 py-4 rounded-full font-bold text-base flex items-center justify-center gap-2 text-white transition-all duration-300"
+              style={{ background: 'linear-gradient(135deg, #2563eb, #1d4ed8)', boxShadow: '0 0 40px rgba(37,99,235,0.5), 0 4px 24px rgba(0,0,0,0.7)' }}
             >
-              Explorar Niveles
+              Ver niveles del método
+              <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
             </button>
           </div>
-          <p className="text-sm text-slate-300 font-medium drop-shadow-md mt-4">
-            Descubre cuál nivel encaja con tu etapa y cómo empezar a escalar con criterio.
+
+          {/* Reducción de riesgo */}
+          <p
+            className="text-xs mt-4 pointer-events-auto font-mono"
+            style={{ color: 'rgba(203,213,225,0.5)', textShadow: '0 1px 6px rgba(0,0,0,1)' }}
+          >
+            Sin permanencia forzada · Cupos limitados · Respuesta en 24h
           </p>
         </motion.div>
       </div>
