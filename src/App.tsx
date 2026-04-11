@@ -580,8 +580,14 @@ export default function App() {
               <br />
               <span className="text-brand-cyan">Es ejecutar sin lógica replicable.</span>
             </h2>
-            <p className="text-sm text-text-muted mb-6 leading-relaxed">
-              Si algo de esto te suena familiar, no es mala suerte — es falta de método:
+            <p className="text-base md:text-lg text-slate-300 mb-5 leading-relaxed font-medium" style={{ lineHeight: '1.75' }}>
+              Lanzas una campaña cruzando los dedos. Los primeros días se ve bien, pero al tercero el costo por resultado se dispara. Subes el presupuesto — empeora. Lo bajas — desaparece. Buscas en YouTube, copias lo que dice un gurú, y el ciclo se repite.
+            </p>
+            <p className="text-base text-brand-cyan font-semibold mb-6 leading-relaxed">
+              El problema no es Meta Ads. Es que nadie te enseñó a pensar tus campañas — solo a configurarlas.
+            </p>
+            <p className="text-sm text-text-muted mb-4 leading-relaxed">
+              ¿Te suena familiar alguno de estos síntomas?
             </p>
             <div className="space-y-3">
               {[
@@ -809,6 +815,100 @@ export default function App() {
         </div>
       </Section>
 
+      {/* TESTIMONIOS */}
+      <Section style={{ background: '#020617' }}>
+        <div className="text-center max-w-3xl mx-auto mb-12">
+          <div className="flex items-center justify-center gap-3 mb-5">
+            <div className="gradient-line w-12" />
+            <span className="section-label">06b / Resultados Reales</span>
+            <div className="gradient-line w-12" />
+          </div>
+          <h2 className="text-4xl md:text-5xl font-display font-bold mb-3">Lo que dicen quienes<br />ya aplican el método</h2>
+          <p className="text-text-muted text-base">Resultados reales de alumnos en su primera cohorte.</p>
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-5 max-w-5xl mx-auto">
+          {[
+            {
+              texto: "Sinceramente lo recomiendo al 100%. Retorné muy rápido el valor de la Masterclass — pasaron 2 meses y el retorno ha sido increíble. Lo que aprendí de IA aplicada a los anuncios cambió completamente cómo trabajo.",
+              nombre: "Carlos M.",
+              rol: "Masterclass · Medellín, Colombia",
+              initials: "CM",
+              nivel: "Masterclass",
+              color: '#22d3ee'
+            },
+            {
+              texto: "Hay un antes y un después de la Mentoría Premium. Por más videos de YouTube que había visto, en una sola sesión aclaré todas mis dudas. Lo que apliqué se vio reflejado en el administrador al día siguiente. Hoy he aumentado 10x mi inversión y mi ROAS es increíble.",
+              nombre: "Daniela R.",
+              rol: "Premium · Bogotá, Colombia",
+              initials: "DR",
+              nivel: "Premium",
+              color: '#2563eb'
+            },
+            {
+              texto: "Adquirí la Masterclass y, solo vendiendo landing pages y apps con lo aprendido — además de Meta Ads — recuperé muy rápido el costo de la mentoría. Hoy estoy generando ingresos que no creía posibles hace 3 meses.",
+              nombre: "Felipe A.",
+              rol: "Masterclass · Guatemala",
+              initials: "FA",
+              nivel: "Masterclass",
+              color: '#22d3ee'
+            },
+            {
+              texto: "Empecé con el Nivel Base sin saber nada de anuncios y en la primera semana ya sabía leer mis métricas. Antes tiraba plata sin entender por qué. Ahora cada peso tiene un propósito.",
+              nombre: "Valentina C.",
+              rol: "Base · Cali, Colombia",
+              initials: "VC",
+              nivel: "Base",
+              color: '#2563eb'
+            },
+            {
+              texto: "Lo que más me sorprendió fue la parte de IA. No es un extra decorativo — está integrada en el flujo real de trabajo. Ahora analizo en minutos lo que antes me tomaba horas y mis clientes lo notan.",
+              nombre: "Sebastián L.",
+              rol: "Premium · Lima, Perú",
+              initials: "SL",
+              nivel: "Premium",
+              color: '#2563eb'
+            },
+            {
+              texto: "Llevaba 8 meses gestionando ads para mi agencia sin estructura real. Ángel me mostró en 2 sesiones dónde estaba perdiendo presupuesto. En el primer mes optimicé y recuperé lo invertido con creces.",
+              nombre: "Mariana V.",
+              rol: "Premium · Ciudad de México",
+              initials: "MV",
+              nivel: "Premium",
+              color: '#2563eb'
+            }
+          ].map((t, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.08 }}
+              className="p-6 rounded-2xl flex flex-col gap-4"
+              style={{ background: '#05091a', border: `1px solid ${t.color}18` }}
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex gap-0.5">
+                  {[...Array(5)].map((_, s) => (
+                    <span key={s} className="text-yellow-400 text-sm">★</span>
+                  ))}
+                </div>
+                <span className="text-xs font-mono px-2 py-0.5 rounded-full" style={{ background: `${t.color}12`, color: t.color, border: `1px solid ${t.color}20` }}>{t.nivel}</span>
+              </div>
+              <p className="text-sm text-slate-300 leading-relaxed flex-grow">"{t.texto}"</p>
+              <div className="flex items-center gap-3 pt-3" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+                <div className="w-9 h-9 rounded-full flex items-center justify-center font-bold text-xs shrink-0" style={{ background: `linear-gradient(135deg, ${t.color}, #1d4ed8)`, color: '#fff' }}>
+                  {t.initials}
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-white">{t.nombre}</p>
+                  <p className="text-xs text-text-muted">{t.rol}</p>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </Section>
+
       {/* 7. MECANISMO ÚNICO */}
       <Section style={{ background: '#05091a', borderTop: '1px solid rgba(255,255,255,0.04)', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
         <div className="text-center max-w-3xl mx-auto mb-16">
@@ -870,6 +970,62 @@ export default function App() {
         </div>
       </Section>
 
+      {/* CREDIBILIDAD / FUNDADOR */}
+      <Section style={{ background: '#020617', borderTop: '1px solid rgba(255,255,255,0.04)' }}>
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-12">
+            <div className="flex items-center justify-center gap-3 mb-5">
+              <div className="gradient-line w-12" />
+              <span className="section-label">07b / Quién está detrás del método</span>
+              <div className="gradient-line w-12" />
+            </div>
+            <h2 className="text-4xl md:text-5xl font-display font-bold mb-3">Por qué este método funciona</h2>
+            <p className="text-text-muted text-base max-w-xl mx-auto">No es teoría. Es experiencia real aplicada a un sistema replicable.</p>
+          </div>
+
+          <div className="flex flex-col md:flex-row items-center gap-10 mb-12">
+            {/* Foto real de Ángel */}
+            <div className="shrink-0 relative">
+              <div className="absolute -inset-1 rounded-3xl blur-xl opacity-50" style={{ background: 'linear-gradient(135deg, #2563eb, #22d3ee)' }} />
+              <img
+                src="/fotoangel.png"
+                alt="Ángel Global Ads — Fundador de Métricas IA™"
+                className="relative w-40 h-40 rounded-3xl object-cover object-top"
+                style={{ border: '2px solid rgba(37,99,235,0.4)', boxShadow: '0 0 40px rgba(37,99,235,0.3)' }}
+              />
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-white mb-1">Ángel Global Ads</p>
+              <p className="text-brand-cyan text-sm font-mono mb-1">Fundador de Métricas IA™</p>
+              <p className="text-xs text-text-muted font-mono mb-5">Especialista en Meta Ads · Performance & Paid Media · Centroamérica · Latinoamérica · Europa</p>
+              <p className="text-base text-slate-300 leading-relaxed mb-3">
+                Con más de 3 años gestionando campañas de Meta Ads para marcas exitosas en múltiples nichos — infoproductos, eCommerce, sector iGaming y nichos Meta Black — he trabajado con negocios en Centroamérica, Latinoamérica y Europa, desde startups hasta marcas con alto volumen de pauta.
+              </p>
+              <p className="text-base text-slate-300 leading-relaxed">
+                Métricas IA™ nació porque vi cómo la mayoría aprende a "picar botones" sin entender la lógica detrás de los números. Creé este método para enseñar a <strong className="text-white">pensar campañas con criterio real</strong> — y que eso se convierta en una habilidad que puedes monetizar desde el primer mes.
+              </p>
+            </div>
+          </div>
+
+          {/* Métricas de credibilidad */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {[
+              { value: "+$2.5M", label: "USD gestionados en Meta Ads", icon: <BarChart3 size={18} />, color: '#2563eb' },
+              { value: "+200", label: "alumnos formados", icon: <Users size={18} />, color: '#22d3ee' },
+              { value: "3 años", label: "de experiencia en Meta Ads", icon: <TrendingUp size={18} />, color: '#2563eb' },
+              { value: "+50", label: "negocios impulsados", icon: <Target size={18} />, color: '#22d3ee' },
+            ].map((m, i) => (
+              <div key={i} className="p-5 rounded-2xl text-center"
+                style={{ background: '#05091a', border: `1px solid ${m.color}20` }}>
+                <div className="flex justify-center mb-2" style={{ color: m.color }}>{m.icon}</div>
+                <p className="text-2xl font-display font-bold text-white mb-1">{m.value}</p>
+                <p className="text-xs text-text-muted leading-tight">{m.label}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </Section>
+
       {/* 8. SECCIÓN DE LOS 3 NIVELES */}
       <Section id="niveles" className="relative" style={{ background: 'linear-gradient(180deg, #05091a 0%, #020617 100%)' }}>
         <div className="absolute top-0 left-0 w-full h-96 pointer-events-none" style={{ background: 'radial-gradient(ellipse at 50% 0%, rgba(37,99,235,0.12), transparent 70%)' }} />
@@ -920,6 +1076,9 @@ export default function App() {
               <div className="mb-4">
                 <p className="text-2xl font-display font-bold text-white">COP $800.000</p>
                 <p className="text-xs text-text-muted font-mono mt-0.5">Pago a crédito disponible · Cupo limitado</p>
+                <p className="text-xs mt-1.5 flex items-center gap-1" style={{ color: '#22d3ee' }}>
+                  <ShieldCheck size={11} /> Garantía primera sesión — si no ves valor, devolución 100%
+                </p>
               </div>
               <button onClick={() => openForm("Base")}
                 className="w-full py-3.5 rounded-xl font-semibold text-sm transition-all duration-300 hover:border-brand-blue/40 hover:text-white mb-2"
@@ -944,7 +1103,7 @@ export default function App() {
             {/* Badge */}
             <div className="absolute -top-px left-0 right-0 flex justify-center z-10">
               <div className="px-5 py-1.5 text-xs font-bold tracking-widest text-white font-mono" style={{ background: 'linear-gradient(90deg, #2563eb, #22d3ee)', borderRadius: '0 0 12px 12px' }}>
-                ★ La decisión más inteligente
+                ★ El nivel más elegido
               </div>
             </div>
             <div className="px-7 pt-11 pb-6" style={{ borderBottom: '1px solid rgba(37,99,235,0.2)' }}>
@@ -964,7 +1123,7 @@ export default function App() {
                   "Criterio de escalado y optimización avanzada.",
                   "Estructura para ofrecer esto como servicio.",
                   "IA integrada en tu flujo de trabajo.",
-                  "El mejor equilibrio entre precio, profundidad y retorno."
+                  "El nivel que elige la mayoría de nuestros alumnos."
                 ].map((item, i) => (
                   <li key={i} className="flex items-start gap-2.5 text-sm text-slate-200">
                     <CheckCircle2 size={13} className="text-brand-cyan shrink-0 mt-0.5" /> {item}
@@ -976,6 +1135,9 @@ export default function App() {
               <div className="mb-1">
                 <p className="text-2xl font-display font-bold text-white">COP $1.900.000</p>
                 <p className="text-xs font-mono mt-0.5" style={{ color: '#22d3ee', opacity: 0.8 }}>La inversión más recuperable del método</p>
+                <p className="text-xs mt-1.5 flex items-center gap-1" style={{ color: '#22d3ee' }}>
+                  <ShieldCheck size={11} /> Garantía primera sesión — si no ves valor, devolución 100%
+                </p>
               </div>
               {/* Frase monetización */}
               <p className="text-xs text-slate-400 italic mb-4 leading-relaxed">
@@ -1033,6 +1195,9 @@ export default function App() {
               <div className="mb-1">
                 <p className="text-2xl font-display font-bold text-white">Desde COP $3.500.000</p>
                 <p className="text-xs text-text-muted font-mono mt-0.5">Cupo muy limitado · Solo por aplicación</p>
+                <p className="text-xs mt-1.5 flex items-center gap-1" style={{ color: '#22d3ee' }}>
+                  <ShieldCheck size={11} /> Garantía primera sesión — si no ves valor, devolución 100%
+                </p>
               </div>
               <p className="text-xs text-slate-400 italic mb-4 leading-relaxed">
                 "No solo aprendes Meta Ads. Dominas IA aplicada. Eso vale más — y se nota en lo que cobras."
@@ -1053,13 +1218,28 @@ export default function App() {
           </motion.div>
         </div>
 
-        {/* Líneas de garantía + oferta fundadora */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mt-8 relative z-10">
-          <p className="text-xs text-text-muted font-mono flex items-center gap-2">
-            <ShieldCheck size={13} className="text-brand-cyan" />
-            Sin permanencia forzada · Si en la primera sesión no ves valor, te devolvemos tu dinero.
+        {/* BLOQUE GARANTÍA */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          className="mt-10 relative z-10 rounded-2xl p-8 text-center"
+          style={{ background: 'linear-gradient(135deg, rgba(34,211,238,0.06), rgba(37,99,235,0.06))', border: '1px solid rgba(34,211,238,0.2)' }}
+        >
+          <div className="flex justify-center mb-4">
+            <div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: 'linear-gradient(135deg, rgba(34,211,238,0.15), rgba(37,99,235,0.15))', border: '1px solid rgba(34,211,238,0.25)' }}>
+              <ShieldCheck size={26} className="text-brand-cyan" />
+            </div>
+          </div>
+          <h3 className="text-xl font-bold text-white mb-2">Sin compromiso. Sin letra chica.</h3>
+          <p className="text-base text-slate-300 leading-relaxed max-w-lg mx-auto mb-2">
+            Si en la primera sesión no sientes que esto es diferente a todo lo que ya probaste, <strong className="text-white">te devolvemos el 100% de tu inversión.</strong> Sin preguntas.
           </p>
-          <span className="hidden sm:block text-text-muted opacity-20">|</span>
+          <p className="text-xs font-mono" style={{ color: '#22d3ee', opacity: 0.7 }}>
+            Sin permanencia forzada · La confianza va en dos sentidos.
+          </p>
+        </motion.div>
+
+        <div className="flex justify-center mt-5 relative z-10">
           <p className="text-xs text-text-muted font-mono flex items-center gap-2">
             <Zap size={13} className="text-brand-cyan" />
             Precios de lanzamiento. Se actualizan con cada nueva cohorte.
@@ -1138,6 +1318,7 @@ export default function App() {
               { q: "¿Hay algún compromiso de permanencia?", a: "No. Si en la primera sesión no ves valor real, te devolvemos lo que pagaste. No hay letra chica ni cláusulas de permanencia. La confianza va en dos sentidos." },
               { q: "¿Qué pasa si elijo un nivel y siento que me quedé corto o me excedí?", a: "Lo evaluamos juntos desde el diagnóstico inicial. Y si en algún punto del proceso necesitas ajustar, lo conversamos. El objetivo es que el nivel que elijas sea el que realmente necesitas." },
               { q: "¿Voy a tener acompañamiento o solo acceso a contenido?", a: "No es un curso donde te quedas solo con videos. Hay sesiones, soporte directo y acceso a una comunidad de estrategas. Dependiendo del nivel, el acompañamiento es más cercano — pero en todos los casos no estás solo." },
+              { q: "¿Por qué no es un curso grabado como los demás?", a: "Porque un curso grabado te enseña botones — no criterio. En Métricas IA™ trabajamos contigo directamente en TUS campañas, con TUS métricas, en TU negocio. Eso es lo que genera resultados reales — y lo que después puedes replicar o vender como servicio." },
             ].map((faq, i) => (
               <div key={i}>
                 <FAQItem question={faq.q} answer={faq.a} />

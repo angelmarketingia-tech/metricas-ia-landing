@@ -140,27 +140,28 @@ export const HeroCanvas = ({ openForm, scrollToLevels, isLight }: { openForm: (p
             </span>
           </div>
 
-          {/* HEADLINE principal — transformación + monetización */}
+          {/* HEADLINE principal */}
           <h1
-            className="text-4xl md:text-5xl lg:text-[4.25rem] font-display font-bold leading-[1.08] mb-5 tracking-tight text-white pointer-events-auto"
+            className="text-4xl md:text-5xl lg:text-[4rem] font-display font-bold leading-[1.08] mb-5 tracking-tight text-white pointer-events-auto"
             style={{ textShadow: '0 0 60px rgba(0,0,0,1), 0 4px 16px rgba(0,0,0,1), 0 0 120px rgba(0,0,0,0.95)' }}
           >
-            Deja de improvisar en Meta Ads<br />
+            Domina Meta Ads con IA<br />
             <span
               className="text-brand-blue"
               style={{ textShadow: '0 0 40px rgba(0,0,0,1), 0 4px 16px rgba(0,0,0,1), 0 0 60px rgba(37,99,235,0.4)' }}
             >
-              y conviértelo en una habilidad<br />rentable que puedes vender.
+              y conviértelo en una habilidad<br />que se paga sola desde el primer mes.
             </span>
           </h1>
 
           {/* Subheadline — legible sobre fondo */}
           <div
-            className="mb-8 px-5 py-3 rounded-2xl pointer-events-auto max-w-xl mx-auto"
-            style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.09)' }}
+            className="mb-6 px-5 py-3 rounded-2xl pointer-events-auto max-w-xl mx-auto"
+            style={{ background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.09)' }}
           >
             <p className="text-sm md:text-base text-slate-200 leading-relaxed text-center">
-              Aprende con estructura real, <span className="text-brand-cyan font-semibold">IA aplicada</span> y acompañamiento cercano — para dominar una habilidad de alto valor y monetizarla más rápido.
+              Estructura real + <span className="text-brand-cyan font-semibold">IA aplicada a tu negocio</span> + acompañamiento directo.<br />
+              El método que convierte tu conocimiento en resultados — y en ingresos.
             </p>
           </div>
 
@@ -169,17 +170,17 @@ export const HeroCanvas = ({ openForm, scrollToLevels, isLight }: { openForm: (p
             <button
               onClick={scrollToLevels}
               className="group px-10 py-4 rounded-full font-bold text-base flex items-center justify-center gap-2 text-white transition-all duration-300"
-              style={{ background: 'linear-gradient(135deg, #2563eb, #1d4ed8)', boxShadow: '0 0 40px rgba(37,99,235,0.5), 0 4px 24px rgba(0,0,0,0.7)' }}
+              style={{ background: 'linear-gradient(135deg, #2563eb, #1d4ed8)', boxShadow: '0 0 40px rgba(37,99,235,0.5), 0 4px 24px rgba(0,0,0,0.7)', fontSize: '1rem' }}
             >
               Ver niveles del método
               <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
             </button>
           </div>
 
-          {/* Reducción de riesgo */}
+          {/* Micro-copy sutil */}
           <p
-            className="text-xs mt-4 pointer-events-auto font-mono"
-            style={{ color: 'rgba(203,213,225,0.5)', textShadow: '0 1px 6px rgba(0,0,0,1)' }}
+            className="text-xs mt-4 pointer-events-auto font-mono px-4 py-2 rounded-full"
+            style={{ color: 'rgba(148,163,184,0.7)', textShadow: '0 1px 6px rgba(0,0,0,1)', background: 'rgba(0,0,0,0.35)' }}
           >
             Sin permanencia forzada · Cupos limitados · Respuesta en 24h
           </p>
